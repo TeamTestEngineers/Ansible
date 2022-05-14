@@ -1,0 +1,211 @@
+ansible all -a 'date'
+You will see all date command has been executed in all the managed nodes.
+Ansible all -a 'ls -a'
+The above command will execute thelist of files in all the managed nodes.  
+
+Ansible reads the file called as inventory file. to identify the information about the managed nodes
+the name of this inventory file is "Hosts" and it is present in "/etc/ansible" folder
+open this file and copy the Ip addres's of all the managed nodes
+
+172.31.36.247
+172.31.36.219
+172.31.36.177
+
+finally save and quit. these are private ip's
+
+Ansible does not require any client software to be installed on the managed nodes. 
+it uses an "agent less" policy to configure remote servers
+i.e it requires only password less ssh to be established between the conrtoller and managed nodes. 
+hence it is called as the "push model". 
+
+important modules in Ansible.
+-----------------------------------------------------------------------------------------------------------------
+|No | Modules         | What is does.										|
+-----------------------------------------------------------------------------------------------------------------
+|1. | command 	      |	This is the default module of ansible and it is used for executing linux commands on	|
+|   |		      |	the managed nodes.									|
+-----------------------------------------------------------------------------------------------------------------  
+|2. | shell 	      |	This is used for executing shell scripts on the managed nodes. it can also be used for	|
+|   | 		      |	executing commands that is used for redirection and piping				|
+-----------------------------------------------------------------------------------------------------------------
+|3. | ping 	      |	This is used to check remote servers can be pinged.					|
+-----------------------------------------------------------------------------------------------------------------
+|4. | file 	      |	Used for creating and deleteing files and directories on the managed nodes. 		|
+-----------------------------------------------------------------------------------------------------------------
+|5. | copy 	      |	Used for copying files and directories from controller to managed nodes.		|
+-----------------------------------------------------------------------------------------------------------------	
+|6. | fetch	      |	This is used to copy files from managed nodes to the controller 			|
+-----------------------------------------------------------------------------------------------------------------
+|7. | user 	      |	Used for creating user assigning home directories default working shells etc. 		|
+-----------------------------------------------------------------------------------------------------------------
+|8. | apt 	      |	This is used for running commands thata are related to pacakge management on ubuntu, 	|
+|   |		      |	debain based linux distribution. 							|
+-----------------------------------------------------------------------------------------------------------------
+|9. | yum 	      |	This is used for package management on redhat, centOS fedora  linux distribution. 	|
+-----------------------------------------------------------------------------------------------------------------
+|10.| service	      |	Using for starting stoping and restarting services on the managed nodes. 		|
+-----------------------------------------------------------------------------------------------------------------
+|11.| replace 	      |	This is used for replacing specific strings in a file with some other strings. 		|
+-----------------------------------------------------------------------------------------------------------------
+|12.| uri 	      |	This is used to check if a remote url is reachable from the managed nodes or not. 	|
+-----------------------------------------------------------------------------------------------------------------
+|13.| setup 	      |	This is used to capture the hardware and software configurations of the managed node. 	|
+-----------------------------------------------------------------------------------------------------------------
+|14.| stat 	      |	This is used to capture information related to files and folders on the managed nods.	|
+-----------------------------------------------------------------------------------------------------------------
+|15.| debug 	      |	This is used to displying the output of any module.					|
+-----------------------------------------------------------------------------------------------------------------
+|16.| include 	      |	This is used for calling child playbooks.						|
+-----------------------------------------------------------------------------------------------------------------
+|17.| template 	      |	This  module is used to copy dynamic configuration files() from controller to managed 	|
+|   |                 | nodes.it is similar to copy mpodule but it can use the group varaibles that we have 	|
+|   |		      |	defined on the managed nodes. 								|
+-----------------------------------------------------------------------------------------------------------------
+|18.| mount	      |	This module is mounting and unmounting devices on the managed nodes.			|
+-----------------------------------------------------------------------------------------------------------------
+|19.| group 	      |	This is used for creating groups on the remote servers. 				|
+-----------------------------------------------------------------------------------------------------------------
+|20.| git 	      |	This is used in performing git version controlling on the managed nodes. 		|
+-----------------------------------------------------------------------------------------------------------------
+|21.| mail 	      |	This is usefull in sending emails from the managed nodes. it is generally used for 	|
+|   |                 | sending error notifications are email messages.  					|
+-----------------------------------------------------------------------------------------------------------------
+|22.| docker_container|	This  module is used for executing docker conainter commands. from the managed nodes.	|
+-----------------------------------------------------------------------------------------------------------------
+|23.| docker_image    |	This is used for executing docker commands. that are related to images.			|
+-----------------------------------------------------------------------------------------------------------------
+|24.| docker_login    |	Used for login into docker hub from the managed node. 					|
+-----------------------------------------------------------------------------------------------------------------
+|25.| ec2 module      |	This is used for launching ec2 instances on aws.					|
+-----------------------------------------------------------------------------------------------------------------
+
+Ansible perfomrs remote configuation of servers in 3 different ways,  
+1. Adhoc commands 
+2. Playbooks 
+3. Ansible roles.  
+  
+  All these 3 ways are depedent on each other. which means, to learn 'Ansible roles' first we need to learn playbooks
+and to learn 'playbooks' we need to learn 'adhoc commands'. Adhoc commands are the basics of ansible. once we are clear 
+with adhoc commands plabooks becomes easy and once we are clearwith playbooks ansible roles become very easy. 
+Adhoc commands are the basicof individual command.
+
+lets see how "Adhoc commands" work below is the syntax format
+ _____________________________________________________________________________________
+|										      |
+|ansible all/groupname/ipaddressof -i <path_of_inventory_file> -m <module_name> -a ' '|
+|_____________________________________________________________________________________|
+
+parameter:  all       -> adhoc command to be executed in all the managed nodes
+            groupname -> adhoc commands to be executed in managed nodes affeliated to certian groups
+	    ipaddress -> adhoc commands to be executed in the specific address of the ipAddress. 
+
+options:    -i        ->  inveroty file 
+            -m        -> which command module you would like to work on.  
+
+arguments:  -a        -> each module will have their own set of argumets to be passed we need to pass within 
+			 single quotes.
+
+ex: ansible all -i /etc/ansible/hosts -m command -a 'free -m'
+the free command will displaty the memory usage of the system, with the help of about ex for ansible 
+we can exeucte the the free -m command and check all the memory usage of all the managed nodes.  
+
+what is an inventory file? 
+Inventory file is any file where you will store the ip address of the managed nodes. the default invenotry file is located in the /etc/ansible/hosts
+you dont have to use the default invetory file, you can create your own file now and mention the ip address within the file. below are the steps to follow
+
+1. vim myinventory 
+2. Adding below ip address to myinventory file.
+	172.31.36.247
+	172.31.36.219
+   save and quit
+3. execute the same command but instead of default file use myinventory file
+   ansible all -i myinventory -m command -a 'free -m'
+4. as we have only 2 ip address the command will be executed in only 2 managed nodes(172.31.36.247,172.31.36.219). 
+ 
+by default ansible assume to execute the /etc/ansible/hosts inventory file and command module.
+
+
+ _______________________________________________________________________________
+|command module. 								                                                |	
+|Ansible command to find the memory infomration of all the managed nodes.	      |
+|-------------------------------------------------------------------------------|	 
+|ansible all -i /etc/ansible/hosts -m command -a 'free -m'			                |
+|-------------------------------------------------------------------------------|
+|when we use the default inventory file we need not specify the -i option. 	    |
+|and since default module is the command module we can skip -m option. 		      |
+|-------------------------------------------------------------------------------|
+|----> ansible all -a 'free -m'							                                    |
+|_______________________________________________________________________________|
+
+ _______________________________________________________________________________
+|shell module: Is used to run the shell scripts on the manages nodes.		        | 
+|Ansible commands for instakling Docker on all the managed nodes. 		          |
+|-------------------------------------------------------------------------------|
+|ansible all -m shell -a 'curl -fsSL get.docker.com -o get-docker.sh'		        |
+|ansible all -m shell -a 'sh get-docker.sh'					                            |
+|_______________________________________________________________________________|
+
+ _______________________________________________________________________________
+|copy module: this is used for copying files and directories. from controller 	|
+|             to managed nodes.							                                    |
+|ansible command to copy /etc/passwd file from controller to the managed nodes. |	
+|-------------------------------------------------------------------------------|
+|ansible all -m  copy -a 'src=/etc/passwd dest=/tmp'				                    |
+|-------------------------------------------------------------------------------|
+|using copy command it is also possible to copy directories along with 		      |
+|subdirectories into the managed nodes.						                              | 
+|create multiple directories on the controller node machinemkdir-p d1/d2/d3/d4	|
+| to copy this entire folder structure				 		                              |
+|-------------------------------------------------------------------------------|
+| ansible all -m copy-a 'src=d1'dest=/tmp'					                            |
+|-------------------------------------------------------------------------------|
+|copy module can be used for changing the ownership group ownership and 	      |
+|permission of files. 								                                          |
+|-------------------------------------------------------------------------------|
+|ansible all -m copy -a 'src=file2 dest=/tmp owner=root group=root mode-765' -b	|
+|-------------------------------------------------------------------------------|
+|"-b" stands for become, it is used to for giving higher privilages on the	    |
+| managed nodes									                                                |
+|_______________________________________________________________________________|
+
+
+Video 4
+the disadvantage of adhoc command is they can only work with one module 
+andon set of commands to perfrom complex configuartation and managment activiteies 
+we can use playbooks. 
+
+Play books are created using YAML.
+and they can work on multiple modules of ansible. we can also implement programming 
+feature like if conditions and loops where a particular module can be executed repeatdly 
+for multiple times and also modules can be executed. and also module can vbe excuted based on 
+specific condtion
+playbooks are designed to work on a singl;e host 
+/group of hosts or all the host present in the 
+inventory file. A single playbook can contain multiple plays
+and a play contains the exact ask that should be perfomed on the 
+remote server
+
+the main advantage of the playbook is resuability.
+
+
+Anisble playbook to install firewalld on all managed nodes. 
+---
+- name: Install firewalld on all managed nodes
+  hosts: all
+  tasks:
+   -  name: Install firewalld
+      apt: 
+       name: firewalld
+       state: present
+       update_cache: yes
+
+
+to check whether the playbook is created syntaciatlly correct or not. 
+ansible-playbook playbook1.yml --syntax-check
+
+to execute the playbook 
+ansible-playbook playbook1.yml -b 
+
+
+
+
